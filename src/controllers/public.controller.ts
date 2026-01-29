@@ -1,67 +1,74 @@
 import { Request, Response } from "express";
-import { prisma } from "../config/prisma";
+import { prisma } from "../config/prisma.js";
 
-// ===== Home =====
 export const getHome = async (req: Request, res: Response) => {
   try {
-    // Featured medicines
-    const featured = await prisma.medicine.findMany({
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      include: { category: true, seller: true },
-    });
-
-    // Categories
     const categories = await prisma.category.findMany({
-      include: { medicines: { take: 5 } },
+      include: { medicines: { take: 4 } }, 
     });
 
-    res.status(200).json({ success: true, data: { featured, categories } });
+    const featuredMedicines = await prisma.medicine.findMany({
+      take: 8,
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.status(200).json({
+      success: true,
+      categories,
+      featured: featuredMedicines,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ message: "Server Error", error });
   }
 };
 
-// ===== Shop (All medicines with filters) =====
-export const getShop = async (req: Request, res: Response) => {
-  try {
-    const { category, minPrice, maxPrice, search } = req.query;
 
-    const filters: any = {};
-    if (category) filters.categoryId = category;
-    if (minPrice || maxPrice) filters.price = {};
-    if (minPrice) filters.price.gte = Number(minPrice);
-    if (maxPrice) filters.price.lte = Number(maxPrice);
-    if (search) filters.name = { contains: search as string, mode: "insensitive" };
+export const getAllMedicines = async (req: Request, res: Response) => {
+  try {
+    const { categoryId, search, minPrice, maxPrice } = req.query;
+
+ 
+    const categoryIdStr = Array.isArray(categoryId)
+      ? categoryId[0]
+      : categoryId;
+
+ 
+    const priceFilter: any = {};
+    if (minPrice) priceFilter.gte = Number(minPrice);
+    if (maxPrice) priceFilter.lte = Number(maxPrice);
+
+   
+    const where: any = {};
+    if (categoryIdStr) where.categoryId = categoryIdStr as string;
+    if (search) where.name = { contains: search as string, mode: "insensitive" };
+    if (Object.keys(priceFilter).length) where.price = priceFilter;
 
     const medicines = await prisma.medicine.findMany({
-      where: filters,
+      where,
       include: { category: true, seller: true },
     });
 
-    res.status(200).json({ success: true, data: medicines });
+    res.status(200).json({ success: true, medicines });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ message: "Server Error", error });
   }
 };
 
-// ===== Medicine Details =====
-export const getMedicineDetails = async (req: Request, res: Response) => {
+export const getMedicineById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+    if (!id) return res.status(400).json({ message: "Medicine ID is required" });
 
     const medicine = await prisma.medicine.findUnique({
-      where: { id },
-      include: { category: true, seller: true, reviews: { include: { customer: true } } },
+      where: { id: id as string }, 
+      include: { category: true, seller: true, reviews: true },
     });
 
-    if (!medicine) return res.status(404).json({ success: false, message: "Medicine not found" });
+    if (!medicine) return res.status(404).json({ message: "Medicine not found" });
 
-    res.status(200).json({ success: true, data: medicine });
+    res.status(200).json({ success: true, medicine });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ message: "Server Error", error });
   }
 };

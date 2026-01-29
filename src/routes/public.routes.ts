@@ -1,11 +1,11 @@
-import express from "express";
-import { getHome, getShop, getMedicineDetails } from "../controllers/public.controller";
+import { Router } from "express";
+import { getHome, getAllMedicines, getMedicineById } from "../controllers/public.controller";
 
-const router = express.Router();
+const router = Router();
 
 // Public Routes
-router.get("/", getHome);             // Home
-router.get("/shop", getShop);        // Shop with filters
-router.get("/shop/:id", getMedicineDetails); // Medicine Details
+router.get("/", getHome);
+router.get("/shop", getAllMedicines);
+router.get("/shop/:id", getMedicineById);
 
 export default router;
