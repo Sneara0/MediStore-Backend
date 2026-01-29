@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+
+    // Environment Settings
+    "module": "Esnext",
+    "moduleResolution": "node",
+    "target": "ES2023",
+
+    // Node.js types
+    "types": ["node"],
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Recommended Options
+    "strict": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "esModuleInterop": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+
+    // Path alias for Prisma generated folder
+    "baseUrl": ".", 
+    "paths": {
+      "@prisma/*": ["generated/prisma/*"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "generated/prisma/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
