@@ -1,10 +1,26 @@
+// src/controllers/public.controller.ts
 import { Request, Response } from "express";
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma";
+import { ParsedQs } from "qs";
+
+
+const toStringQuery = (
+  value: string | ParsedQs | (string | ParsedQs)[] | undefined
+): string | undefined => {
+  if (!value) return undefined;
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) {
+    const firstString = value.find((v) => typeof v === "string");
+    return firstString;
+  }
+  return undefined; 
+};
+
 
 export const getHome = async (req: Request, res: Response) => {
   try {
     const categories = await prisma.category.findMany({
-      include: { medicines: { take: 4 } }, 
+      include: { medicines: { take: 4 } },
     });
 
     const featuredMedicines = await prisma.medicine.findMany({
@@ -12,11 +28,7 @@ export const getHome = async (req: Request, res: Response) => {
       orderBy: { createdAt: "desc" },
     });
 
-    res.status(200).json({
-      success: true,
-      categories,
-      featured: featuredMedicines,
-    });
+    res.status(200).json({ success: true, categories, featured: featuredMedicines });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
   }
@@ -25,22 +37,18 @@ export const getHome = async (req: Request, res: Response) => {
 
 export const getAllMedicines = async (req: Request, res: Response) => {
   try {
-    const { categoryId, search, minPrice, maxPrice } = req.query;
+    const categoryId = toStringQuery(req.query.categoryId);
+    const search = toStringQuery(req.query.search);
+    const minPrice = toStringQuery(req.query.minPrice);
+    const maxPrice = toStringQuery(req.query.maxPrice);
 
- 
-    const categoryIdStr = Array.isArray(categoryId)
-      ? categoryId[0]
-      : categoryId;
-
- 
     const priceFilter: any = {};
     if (minPrice) priceFilter.gte = Number(minPrice);
     if (maxPrice) priceFilter.lte = Number(maxPrice);
 
-   
     const where: any = {};
-    if (categoryIdStr) where.categoryId = categoryIdStr as string;
-    if (search) where.name = { contains: search as string, mode: "insensitive" };
+    if (categoryId) where.categoryId = categoryId;
+    if (search) where.name = { contains: search, mode: "insensitive" };
     if (Object.keys(priceFilter).length) where.price = priceFilter;
 
     const medicines = await prisma.medicine.findMany({
@@ -54,14 +62,17 @@ export const getAllMedicines = async (req: Request, res: Response) => {
   }
 };
 
+
 export const getMedicineById = async (req: Request, res: Response) => {
   try {
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = req.params.id;
 
-    if (!id) return res.status(400).json({ message: "Medicine ID is required" });
+    if (!id || Array.isArray(id)) {
+      return res.status(400).json({ message: "Invalid medicine ID" });
+    }
 
     const medicine = await prisma.medicine.findUnique({
-      where: { id: id as string }, 
+      where: { id },
       include: { category: true, seller: true, reviews: true },
     });
 

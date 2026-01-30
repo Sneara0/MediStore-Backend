@@ -1,51 +1,54 @@
-// src/middleware/protect.ts
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { prisma } from "../config/prisma.js";
+import { prisma } from "../config/prisma";
 
-// ✅ Extend Request type to include `user`
+// ১️⃣ AuthRequest: Request এর extended version
 export interface AuthRequest extends Request {
-  user?: {
+  user: {
     id: string;
     email: string;
     role: string;
-    // Add other fields from your Prisma User model if needed
   };
 }
 
-export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
+// ২️⃣ Protect middleware
+export const protect: RequestHandler = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
+    // req কে cast করি AuthRequest হিসেবে
+    const authReq = req as AuthRequest;
+
+    const authHeader = authReq.headers.authorization;
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ message: "Not authorized, token missing" });
     }
 
     const token = authHeader.split(" ")[1];
-
-    // ✅ Runtime-checked JWT secret
     const JWT_SECRET = process.env.JWT_SECRET;
     if (!JWT_SECRET) {
-      return res.status(500).json({ message: "JWT_SECRET is not defined" });
+      return res.status(500).json({ message: "JWT secret not configured" });
     }
 
- 
+    // Token verify করা
     const decoded = jwt.verify(token as string, JWT_SECRET) as JwtPayload;
 
-    if (!decoded || !decoded.id) {
+    if (!decoded || typeof decoded !== "object" || !decoded.id) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
-  
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.id as string },
-      select: { id: true, email: true, role: true }, 
-    });
+    // Database থেকে user খুঁজে বের করা
+    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
 
-    if (!user) return res.status(401).json({ message: "User not found" });
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
 
-    req.user = user; 
+    // req.user set করা
+    authReq.user = { id: user.id, email: user.email, role: user.role };
+
+    // পরবর্তী middleware/callback কল করা
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Not authorized", error });
+    res.status(401).json({ message: "Not authorized" });
   }
 };

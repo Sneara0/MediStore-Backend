@@ -6,11 +6,13 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 model User {
   id        String     @id @default(uuid())
   name      String
   email     String     @unique
   password  String
+  isBanned  Boolean    @default(false)
   role      Role       @default(CUSTOMER)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -86,4 +88,3 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
 }
-
