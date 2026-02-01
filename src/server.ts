@@ -7,6 +7,10 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+import authRoutes from "./routes/authRoutes";
+import medicineRoutes from "./routes/medicineRoutes";
+app.use("/api", authRoutes);
+app.use("/api/shop", medicineRoutes);
 
 app.get("/", (req, res) => {
   res.send("MediStore Backend Running 🚀");
