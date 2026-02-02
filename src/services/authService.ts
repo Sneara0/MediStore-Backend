@@ -21,9 +21,7 @@ export const registerUserService = async (
     data: { name, email, password: hashedPassword, role }
   });
 
-  // Optional: token generate করলে auto-login হবে
-  // const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: "7d" });
-  // return { user, token };
+  
 
   return user;
 };
