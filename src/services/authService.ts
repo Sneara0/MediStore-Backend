@@ -3,7 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export type Role = "CUSTOMER" | "SELLER" | "ADMIN";
-
 export const registerUserService = async (
   name: string,
   email: string,
@@ -21,6 +20,10 @@ export const registerUserService = async (
   const user = await prisma.user.create({
     data: { name, email, password: hashedPassword, role }
   });
+
+  // Optional: token generate করলে auto-login হবে
+  // const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: "7d" });
+  // return { user, token };
 
   return user;
 };
