@@ -71,7 +71,7 @@ export const updateMedicine = async (
   res: Response
 ) => {
   const sellerId = req.user!.id;
-  const medicineId = req.params.id;
+  const medicineId = req.params.id as string;
 
   const updated = await updateMedicineService(
     sellerId,
@@ -94,7 +94,7 @@ export const deleteMedicine = async (
   res: Response
 ) => {
   const sellerId = req.user!.id;
-  const medicineId = req.params.id;
+  const medicineId = req.params.id as string;
 
   await deleteMedicineService(sellerId, medicineId);
 
@@ -129,7 +129,7 @@ export const updateOrderStatus = async (
   res: Response
 ) => {
   const sellerId = req.user!.id;
-  const orderId = req.params.id;
+  const orderId = req.params.id as string;
   const { status } = req.body;
 
   const updated = await updateOrderStatusService(

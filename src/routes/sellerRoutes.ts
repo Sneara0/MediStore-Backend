@@ -13,18 +13,14 @@ import {
 
 const router = express.Router();
 
-/* ===========================
-   Seller Dashboard
-=========================== */
+
 router.get(
   "/dashboard",
   protect(["SELLER"]),
   getSellerDashboard
 );
 
-/* ===========================
-   Seller Medicines CRUD
-=========================== */
+
 router.get(
   "/medicines",
   protect(["SELLER"]),
@@ -49,9 +45,7 @@ router.delete(
   deleteMedicine
 );
 
-/* ===========================
-   Seller Orders
-=========================== */
+
 router.get(
   "/orders",
   protect(["SELLER"]),
