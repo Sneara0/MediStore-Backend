@@ -1,10 +1,34 @@
 import { prisma } from "../config/prisma";
 
-export const placeOrderService = async (userId: string, shippingAddress: string) => {
-  const cartItems = await prisma.cartItem.findMany({ where: { userId }, include: { medicine: true } });
+// Type definitions
+interface CartItemWithMedicine {
+  id: string;
+  medicineId: string;
+  quantity: number;
+  medicine: {
+    id: string;
+    name: string;
+    price: number;
+  };
+}
+
+// Place Order
+export const placeOrderService = async (
+  userId: string,
+  shippingAddress: string
+) => {
+  const cartItems: CartItemWithMedicine[] = await prisma.cartItem.findMany({
+    where: { userId },
+    include: { medicine: true },
+  });
+
   if (!cartItems.length) throw new Error("Cart is empty");
 
-  const total = cartItems.reduce((acc, item) => acc + item.medicine.price * item.quantity, 0);
+  const total: number = cartItems.reduce(
+    (acc: number, item: CartItemWithMedicine) =>
+      acc + item.medicine.price * item.quantity,
+    0
+  );
 
   const order = await prisma.order.create({
     data: {
@@ -13,7 +37,7 @@ export const placeOrderService = async (userId: string, shippingAddress: string)
       shippingAddress,
       status: "PLACED",
       items: {
-        create: cartItems.map(item => ({
+        create: cartItems.map((item: CartItemWithMedicine) => ({
           medicineId: item.medicineId,
           quantity: item.quantity,
           price: item.medicine.price,
@@ -28,6 +52,7 @@ export const placeOrderService = async (userId: string, shippingAddress: string)
   return order;
 };
 
+// Get all orders for a user
 export const getOrdersService = async (userId: string) => {
   return prisma.order.findMany({
     where: { customerId: userId },
@@ -36,11 +61,17 @@ export const getOrdersService = async (userId: string) => {
   });
 };
 
-export const getOrderByIdService = async (userId: string, orderId: string) => {
+// Get order by id
+export const getOrderByIdService = async (
+  userId: string,
+  orderId: string
+) => {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
     include: { items: { include: { medicine: true } } },
   });
+
   if (!order || order.customerId !== userId) throw new Error("Order not found");
+
   return order;
 };
