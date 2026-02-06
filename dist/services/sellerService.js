@@ -1,4 +1,5 @@
 import { prisma } from "../config/prisma";
+// ১. Seller Dashboard
 export const getSellerDashboardService = async (sellerId) => {
     const totalMedicines = await prisma.medicine.count({
         where: { sellerId },
@@ -17,24 +18,23 @@ export const getSellerDashboardService = async (sellerId) => {
         pendingOrders: sellerOrders.filter((o) => o.status === "PLACED" || o.status === "PROCESSING").length,
     };
 };
+// ২. Get Seller Medicines
 export const getSellerMedicinesService = async (sellerId) => {
     return prisma.medicine.findMany({
         where: { sellerId },
         include: { category: true },
     });
 };
+// ৩. Add Medicine
 export const addMedicineService = async (sellerId, data) => {
     return prisma.medicine.create({
         data: {
-            name: data.name,
-            description: data.description,
-            price: data.price,
-            stock: data.stock,
-            categoryId: data.categoryId,
+            ...data,
             sellerId,
         },
     });
 };
+// ৪. Update Medicine
 export const updateMedicineService = async (sellerId, medicineId, data) => {
     const medicine = await prisma.medicine.findUnique({
         where: { id: medicineId },
@@ -47,6 +47,7 @@ export const updateMedicineService = async (sellerId, medicineId, data) => {
         data,
     });
 };
+// ৫. Delete Medicine
 export const deleteMedicineService = async (sellerId, medicineId) => {
     const medicine = await prisma.medicine.findUnique({
         where: { id: medicineId },
@@ -58,6 +59,7 @@ export const deleteMedicineService = async (sellerId, medicineId) => {
         where: { id: medicineId },
     });
 };
+// ৬. Get Seller Orders
 export const getSellerOrdersService = async (sellerId) => {
     const orders = await prisma.order.findMany({
         include: {
@@ -69,6 +71,7 @@ export const getSellerOrdersService = async (sellerId) => {
     });
     return orders.filter((order) => order.items.some((item) => item.medicine.sellerId === sellerId));
 };
+// ৭. Update Order Status
 export const updateOrderStatusService = async (sellerId, orderId, status) => {
     const orders = await getSellerOrdersService(sellerId);
     const order = orders.find((o) => o.id === orderId);

@@ -1,3 +1,4 @@
+import { Medicine, Order } from "@prisma/client";
 export declare const getSellerDashboardService: (sellerId: string) => Promise<{
     totalMedicines: number;
     totalOrders: number;
@@ -19,7 +20,7 @@ export declare const getSellerMedicinesService: (sellerId: string) => Promise<({
     categoryId: string;
     sellerId: string;
 })[]>;
-export declare const addMedicineService: (sellerId: string, data: any) => Promise<{
+export declare const addMedicineService: (sellerId: string, data: Omit<Medicine, "id" | "sellerId" | "createdAt" | "updatedAt">) => Promise<{
     id: string;
     name: string;
     createdAt: Date;
@@ -30,7 +31,7 @@ export declare const addMedicineService: (sellerId: string, data: any) => Promis
     categoryId: string;
     sellerId: string;
 }>;
-export declare const updateMedicineService: (sellerId: string, medicineId: string, data: any) => Promise<{
+export declare const updateMedicineService: (sellerId: string, medicineId: string, data: Partial<Omit<Medicine, "id" | "sellerId" | "createdAt" | "updatedAt">>) => Promise<{
     id: string;
     name: string;
     createdAt: Date;
@@ -91,7 +92,7 @@ export declare const getSellerOrdersService: (sellerId: string) => Promise<({
     shippingAddress: string;
     customerId: string;
 })[]>;
-export declare const updateOrderStatusService: (sellerId: string, orderId: string, status: string) => Promise<{
+export declare const updateOrderStatusService: (sellerId: string, orderId: string, status: Order["status"]) => Promise<{
     id: string;
     createdAt: Date;
     updatedAt: Date;
