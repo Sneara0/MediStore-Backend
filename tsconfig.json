@@ -1,27 +1,29 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
+    
 
     // Environment Settings
+    "target": "ES2023",
     "module": "ESNext",
     "moduleResolution": "node",
-    "target": "ES2023",
 
     // Node.js types
     "types": ["node"],
+    "typeRoots": ["./node_modules/@types"],
 
-    // Other Outputs
+    // Output options
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
 
     // Stricter Typechecking Options
+    "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
-    // Recommended Options
-    "strict": true,
     "isolatedModules": true,
+
+    // Module Interop
     "esModuleInterop": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
