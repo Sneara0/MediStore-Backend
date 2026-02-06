@@ -1,19 +1,21 @@
 import {prisma} from "../config/prisma";
-import { OrderStatus } from "@prisma/client";
+import type { Medicine, Order, OrderItem } from "@prisma/client";
 
-// ১. Get Seller Dashboard
+
 export const getSellerDashboardService = async (sellerId: string) => {
-  const totalMedicines = await prisma.medicine.count({
+
+  const totalMedicines: number = await prisma.medicine.count({
     where: { sellerId },
   });
 
-  const orders = await prisma.order.findMany({
-    include: {
-      items: {
-        include: { medicine: true },
+  const orders: (Order & { items: (OrderItem & { medicine: Medicine })[] })[] =
+    await prisma.order.findMany({
+      include: {
+        items: {
+          include: { medicine: true },
+        },
       },
-    },
-  });
+    });
 
   const sellerOrders = orders.filter((order) =>
     order.items.some((item) => item.medicine.sellerId === sellerId)
@@ -23,38 +25,30 @@ export const getSellerDashboardService = async (sellerId: string) => {
     totalMedicines,
     totalOrders: sellerOrders.length,
     pendingOrders: sellerOrders.filter(
-      (o) => o.status === OrderStatus.PLACED || o.status === OrderStatus.PROCESSING
+      (o) => o.status === "PLACED" || o.status === "PROCESSING"
     ).length,
   };
 };
 
 // ২. Get Seller Medicines
-export const getSellerMedicinesService = async (sellerId: string) => {
+export const getSellerMedicinesService = async (
+  sellerId: string
+): Promise<Medicine[]> => {
   return prisma.medicine.findMany({
     where: { sellerId },
     include: { category: true },
   });
 };
 
-// ৩. Add Medicine (Relation safe)
+// ৩. Add Medicine
 export const addMedicineService = async (
   sellerId: string,
-  data: {
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    categoryId: string;
-  }
-) => {
+  data: Omit<Medicine, "id" | "sellerId" | "createdAt" | "updatedAt">
+): Promise<Medicine> => {
   return prisma.medicine.create({
     data: {
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      stock: data.stock,
-      seller: { connect: { id: sellerId } },
-      category: { connect: { id: data.categoryId } },
+      ...data,
+      sellerId,
     },
   });
 };
@@ -63,14 +57,8 @@ export const addMedicineService = async (
 export const updateMedicineService = async (
   sellerId: string,
   medicineId: string,
-  data: Partial<{
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    categoryId: string;
-  }>
-) => {
+  data: Partial<Omit<Medicine, "id" | "sellerId" | "createdAt" | "updatedAt">>
+): Promise<Medicine> => {
   const medicine = await prisma.medicine.findUnique({
     where: { id: medicineId },
   });
@@ -79,20 +67,17 @@ export const updateMedicineService = async (
     throw new Error("Not authorized");
   }
 
-  const updateData: any = { ...data };
-  if (data.categoryId) {
-    updateData.category = { connect: { id: data.categoryId } };
-    delete updateData.categoryId;
-  }
-
   return prisma.medicine.update({
     where: { id: medicineId },
-    data: updateData,
+    data,
   });
 };
 
 // ৫. Delete Medicine
-export const deleteMedicineService = async (sellerId: string, medicineId: string) => {
+export const deleteMedicineService = async (
+  sellerId: string,
+  medicineId: string
+): Promise<Medicine> => {
   const medicine = await prisma.medicine.findUnique({
     where: { id: medicineId },
   });
@@ -107,7 +92,9 @@ export const deleteMedicineService = async (sellerId: string, medicineId: string
 };
 
 // ৬. Get Seller Orders
-export const getSellerOrdersService = async (sellerId: string) => {
+export const getSellerOrdersService = async (
+  sellerId: string
+): Promise<(Order & { items: (OrderItem & { medicine: Medicine })[] })[]> => {
   const orders = await prisma.order.findMany({
     include: {
       customer: true,
@@ -122,12 +109,12 @@ export const getSellerOrdersService = async (sellerId: string) => {
   );
 };
 
-// ৭. Update Order Status (Enum compatible)
+// ৭. Update Order Status
 export const updateOrderStatusService = async (
   sellerId: string,
   orderId: string,
-  status: OrderStatus // Enum ব্যবহার করা হচ্ছে
-) => {
+  status: Order["status"]
+): Promise<Order> => {
   const orders = await getSellerOrdersService(sellerId);
 
   const order = orders.find((o) => o.id === orderId);
@@ -135,6 +122,6 @@ export const updateOrderStatusService = async (
 
   return prisma.order.update({
     where: { id: orderId },
-    data: { status }, // Enum value ব্যবহার
+    data: { status },
   });
 };
