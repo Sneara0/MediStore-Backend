@@ -4,7 +4,7 @@
 
     // Environment Settings
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "target": "ES2023",
 
     // Node.js types
