@@ -1,15 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "src/server.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "src/server.ts" }
-  ],
-  "files": [
-    "generated/**"
-  ]
+  "functions": {
+    "src/server.ts": { "runtime": "nodejs20.x" }
+  },
+  "files": ["generated/**"],
+  "routes": [{ "src": "/(.*)", "dest": "src/server.ts" }]
 }
