@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 
-import authRoutes from "./routes/authRoutes";
+import authRoutes from "./routes/authRoutes.js";
 import medicineRoutes from "./routes/medicineRoutes";
 import cartRoutes from "./routes/cartRoutes";
 import orderRoutes from "./routes/orderRoutes";
