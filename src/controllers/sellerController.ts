@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { RequestWithUser } from "../middlewares/auth";
+import { RequestWithUser } from "../middlewares/auth.js";
 
 import {
   getSellerDashboardService,
@@ -9,7 +9,7 @@ import {
   deleteMedicineService,
   getSellerOrdersService,
   updateOrderStatusService,
-} from "../services/sellerService";
+} from "../services/sellerService.js";
 
 /* ===========================
    Seller Dashboard

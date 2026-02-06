@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middlewares/auth";
+import { protect } from "../middlewares/auth.js";
 
 import {
   getSellerDashboard,
@@ -9,7 +9,7 @@ import {
   deleteMedicine,
   getSellerOrders,
   updateOrderStatus,
-} from "../controllers/sellerController";
+} from "../controllers/sellerController.js";
 
 const router = express.Router();
 

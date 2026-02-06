@@ -1,5 +1,5 @@
-import { asyncHandler } from "../errors/asyncHandler";
-import { ApiError } from "../errors/ApiError";
+import { asyncHandler } from "../errors/asyncHandler.js";
+import { ApiError } from "../errors/ApiError.js";
 import {
   registerUserService,
   loginUserService,

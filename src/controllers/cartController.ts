@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { addToCartService, getCartService, removeFromCartService } from "../services/cartService";
+import { addToCartService, getCartService, removeFromCartService } from "../services/cartService.js";
 
 export const addToCart = async (req: Request, res: Response) => {
   try {

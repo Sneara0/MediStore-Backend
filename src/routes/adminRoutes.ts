@@ -5,10 +5,10 @@ import {
   getAllOrders,
   addCategory,
   deleteCategory,
-} from "../controllers/adminController";
+} from "../controllers/adminController.js";
 
-import { protect } from "../middlewares/auth";
-import { roleMiddleware } from "../middlewares/roleMiddleware";
+import { protect } from "../middlewares/auth.js";
+import { roleMiddleware } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 

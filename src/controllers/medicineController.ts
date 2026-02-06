@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getAllMedicinesService, getMedicineByIdService } from "../services/medicineService";
+import { getAllMedicinesService, getMedicineByIdService } from "../services/medicineService.js";
 
 export const getAllMedicines = async (req: Request, res: Response) => {
   try {
