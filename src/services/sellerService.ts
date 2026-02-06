@@ -1,20 +1,24 @@
-import { prisma } from "../config/prisma";
+import {prisma} from "../config/prisma";
 import { Medicine, Order, OrderItem } from "@prisma/client";
 
 // ১. Seller Dashboard
 export const getSellerDashboardService = async (sellerId: string) => {
-  const totalMedicines = await prisma.medicine.count({
+  // Total medicines by seller
+  const totalMedicines: number = await prisma.medicine.count({
     where: { sellerId },
   });
 
-  const orders = await prisma.order.findMany({
-    include: {
-      items: {
-        include: { medicine: true },
+  // All orders including items and medicines
+  const orders: (Order & { items: (OrderItem & { medicine: Medicine })[] })[] =
+    await prisma.order.findMany({
+      include: {
+        items: {
+          include: { medicine: true },
+        },
       },
-    },
-  });
+    });
 
+  // Filter orders that belong to this seller
   const sellerOrders = orders.filter((order) =>
     order.items.some((item) => item.medicine.sellerId === sellerId)
   );
@@ -29,7 +33,9 @@ export const getSellerDashboardService = async (sellerId: string) => {
 };
 
 // ২. Get Seller Medicines
-export const getSellerMedicinesService = async (sellerId: string) => {
+export const getSellerMedicinesService = async (
+  sellerId: string
+): Promise<Medicine[]> => {
   return prisma.medicine.findMany({
     where: { sellerId },
     include: { category: true },
@@ -40,7 +46,7 @@ export const getSellerMedicinesService = async (sellerId: string) => {
 export const addMedicineService = async (
   sellerId: string,
   data: Omit<Medicine, "id" | "sellerId" | "createdAt" | "updatedAt">
-) => {
+): Promise<Medicine> => {
   return prisma.medicine.create({
     data: {
       ...data,
@@ -54,7 +60,7 @@ export const updateMedicineService = async (
   sellerId: string,
   medicineId: string,
   data: Partial<Omit<Medicine, "id" | "sellerId" | "createdAt" | "updatedAt">>
-) => {
+): Promise<Medicine> => {
   const medicine = await prisma.medicine.findUnique({
     where: { id: medicineId },
   });
@@ -73,7 +79,7 @@ export const updateMedicineService = async (
 export const deleteMedicineService = async (
   sellerId: string,
   medicineId: string
-) => {
+): Promise<Medicine> => {
   const medicine = await prisma.medicine.findUnique({
     where: { id: medicineId },
   });
@@ -88,7 +94,9 @@ export const deleteMedicineService = async (
 };
 
 // ৬. Get Seller Orders
-export const getSellerOrdersService = async (sellerId: string) => {
+export const getSellerOrdersService = async (
+  sellerId: string
+): Promise<(Order & { items: (OrderItem & { medicine: Medicine })[] })[]> => {
   const orders = await prisma.order.findMany({
     include: {
       customer: true,
@@ -108,7 +116,7 @@ export const updateOrderStatusService = async (
   sellerId: string,
   orderId: string,
   status: Order["status"]
-) => {
+): Promise<Order> => {
   const orders = await getSellerOrdersService(sellerId);
 
   const order = orders.find((o) => o.id === orderId);
