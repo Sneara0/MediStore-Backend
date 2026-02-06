@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateOrderStatusService = exports.getSellerOrdersService = exports.deleteMedicineService = exports.updateMedicineService = exports.addMedicineService = exports.getSellerMedicinesService = exports.getSellerDashboardService = void 0;
 const prisma_1 = require("../config/prisma");
-// ১. Seller Dashboard
 const getSellerDashboardService = async (sellerId) => {
     const totalMedicines = await prisma_1.prisma.medicine.count({
         where: { sellerId },

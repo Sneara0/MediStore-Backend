@@ -1,14 +1,13 @@
 import {prisma} from "../config/prisma";
-import { Medicine, Order, OrderItem } from "@prisma/client";
+import type { Medicine, Order, OrderItem } from "@prisma/client";
 
-// ১. Seller Dashboard
+
 export const getSellerDashboardService = async (sellerId: string) => {
-  // Total medicines by seller
+
   const totalMedicines: number = await prisma.medicine.count({
     where: { sellerId },
   });
 
-  // All orders including items and medicines
   const orders: (Order & { items: (OrderItem & { medicine: Medicine })[] })[] =
     await prisma.order.findMany({
       include: {
@@ -18,7 +17,6 @@ export const getSellerDashboardService = async (sellerId: string) => {
       },
     });
 
-  // Filter orders that belong to this seller
   const sellerOrders = orders.filter((order) =>
     order.items.some((item) => item.medicine.sellerId === sellerId)
   );
