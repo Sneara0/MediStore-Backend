@@ -1,4 +1,4 @@
-import prisma from "../config/prisma";
+import {prisma} from "../config/prisma";
 import { OrderStatus } from "@prisma/client";
 
 // ১. Get Seller Dashboard

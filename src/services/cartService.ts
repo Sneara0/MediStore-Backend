@@ -1,4 +1,4 @@
-import prisma from "../config/prisma";
+import {prisma} from "../config/prisma";
 
 export const addToCartService = async (userId: string, medicineId: string, quantity: number) => {
   const existing = await prisma.cartItem.findFirst({ where: { userId, medicineId } });
