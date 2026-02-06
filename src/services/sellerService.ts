@@ -1,6 +1,7 @@
 import { prisma } from "../config/prisma";
+import { Medicine, Order, OrderItem } from "@prisma/client";
 
-
+// ১. Seller Dashboard
 export const getSellerDashboardService = async (sellerId: string) => {
   const totalMedicines = await prisma.medicine.count({
     where: { sellerId },
@@ -27,7 +28,7 @@ export const getSellerDashboardService = async (sellerId: string) => {
   };
 };
 
-
+// ২. Get Seller Medicines
 export const getSellerMedicinesService = async (sellerId: string) => {
   return prisma.medicine.findMany({
     where: { sellerId },
@@ -35,26 +36,24 @@ export const getSellerMedicinesService = async (sellerId: string) => {
   });
 };
 
+// ৩. Add Medicine
 export const addMedicineService = async (
   sellerId: string,
-  data: any
+  data: Omit<Medicine, "id" | "sellerId" | "createdAt" | "updatedAt">
 ) => {
   return prisma.medicine.create({
     data: {
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      stock: data.stock,
-      categoryId: data.categoryId,
+      ...data,
       sellerId,
     },
   });
 };
 
+// ৪. Update Medicine
 export const updateMedicineService = async (
   sellerId: string,
   medicineId: string,
-  data: any
+  data: Partial<Omit<Medicine, "id" | "sellerId" | "createdAt" | "updatedAt">>
 ) => {
   const medicine = await prisma.medicine.findUnique({
     where: { id: medicineId },
@@ -70,6 +69,7 @@ export const updateMedicineService = async (
   });
 };
 
+// ৫. Delete Medicine
 export const deleteMedicineService = async (
   sellerId: string,
   medicineId: string
@@ -87,7 +87,7 @@ export const deleteMedicineService = async (
   });
 };
 
-
+// ৬. Get Seller Orders
 export const getSellerOrdersService = async (sellerId: string) => {
   const orders = await prisma.order.findMany({
     include: {
@@ -103,10 +103,11 @@ export const getSellerOrdersService = async (sellerId: string) => {
   );
 };
 
+// ৭. Update Order Status
 export const updateOrderStatusService = async (
   sellerId: string,
   orderId: string,
-  status: string
+  status: Order["status"]
 ) => {
   const orders = await getSellerOrdersService(sellerId);
 
@@ -115,6 +116,6 @@ export const updateOrderStatusService = async (
 
   return prisma.order.update({
     where: { id: orderId },
-    data: { status } as any,
+    data: { status },
   });
 };
