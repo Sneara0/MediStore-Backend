@@ -23,7 +23,6 @@ export const placeOrderService = async (userId: string, shippingAddress: string)
     include: { items: { include: { medicine: true } } },
   });
 
-  // Clear cart
   await prisma.cartItem.deleteMany({ where: { userId } });
 
   return order;

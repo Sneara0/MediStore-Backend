@@ -1,8 +1,6 @@
 import { prisma } from "../config/prisma";
 
-/* ===========================
-   Dashboard Stats
-=========================== */
+
 export const getSellerDashboardService = async (sellerId: string) => {
   const totalMedicines = await prisma.medicine.count({
     where: { sellerId },
@@ -16,7 +14,6 @@ export const getSellerDashboardService = async (sellerId: string) => {
     },
   });
 
-  // Filter only seller orders
   const sellerOrders = orders.filter((order) =>
     order.items.some((item) => item.medicine.sellerId === sellerId)
   );
@@ -30,9 +27,7 @@ export const getSellerDashboardService = async (sellerId: string) => {
   };
 };
 
-/* ===========================
-   Seller Medicines
-=========================== */
+
 export const getSellerMedicinesService = async (sellerId: string) => {
   return prisma.medicine.findMany({
     where: { sellerId },
@@ -92,9 +87,7 @@ export const deleteMedicineService = async (
   });
 };
 
-/* ===========================
-   Seller Orders
-=========================== */
+
 export const getSellerOrdersService = async (sellerId: string) => {
   const orders = await prisma.order.findMany({
     include: {
