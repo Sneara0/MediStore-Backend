@@ -3,7 +3,7 @@
     "outDir": "./dist",
 
     // Environment Settings
-    "module": "ESNext",               // capital N
+    "module": "Esnext",
     "moduleResolution": "node",
     "target": "ES2023",
 
