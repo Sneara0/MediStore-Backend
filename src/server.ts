@@ -2,16 +2,17 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
+/* Load env */
 dotenv.config();
 
 const app = express();
 
-/* ✅ FRONTEND URL Allow */
+/* CORS Setup */
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://medistore-frontend-kappa.vercel.app",
+      process.env.FRONTEND_URL,
     ],
     credentials: true,
   })
@@ -31,12 +32,9 @@ import adminRoutes from "./routes/adminRoutes.js";
 /* Error Handler */
 import { errorHandler } from "./errors/errorHandler.js";
 
-/* ✅ API Routes */
+/* API Routes */
 app.use("/api/auth", authRoutes);
-
-/* 🔥 Medicine Route Standard করা হলো */
 app.use("/api/medicines", medicineRoutes);
-
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/profile", profileRoutes);
@@ -51,6 +49,7 @@ app.get("/", (req, res) => {
 /* Error Middleware */
 app.use(errorHandler);
 
+/* Start Server */
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
   console.log(`Server running on port ${PORT}`)
