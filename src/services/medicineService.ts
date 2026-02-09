@@ -1,4 +1,4 @@
-import {prisma} from "../config/prisma";
+import { prisma } from "../config/prisma";
 
 interface MedicineQuery {
   category?: string;
@@ -14,7 +14,7 @@ export const getAllMedicinesService = async (query: MedicineQuery) => {
 
   return await prisma.medicine.findMany({
     where: {
-      ...(query.category && { category: { name: query.category } }),
+      ...(query.category && { category: { is: { name: query.category } } }),
       ...(query.search && { name: { contains: query.search, mode: "insensitive" } }),
       ...(min !== undefined || max !== undefined
         ? {
