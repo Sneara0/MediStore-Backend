@@ -4,11 +4,11 @@
   "description": "",
   "main": "dist/server.ts",
   "scripts": {
-    "dev": "npx tsx watch src/server.ts",
     "seed": "npx tsx src/prisma/seed.ts",
-    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "prisma generate && tsc",
     "start": "node dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npx tsx watch src/server.ts"
   },
   "keywords": [],
   "author": "",
