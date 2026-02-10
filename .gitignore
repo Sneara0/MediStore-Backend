@@ -6,3 +6,8 @@ node_modules
 
 .vercel
 .env*.local
+/.dist
+/node_modules
+/coverage
+/dist
+/generated/prisma
