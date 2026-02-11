@@ -1,35 +1,35 @@
-import {prisma} from "../config/prisma";
-
+import { prisma } from "../config/prisma.js";
 
 export const getAllUsersService = async () => {
-  return prisma.user.findMany();
+  return await prisma.user.findMany({
+    orderBy: { createdAt: 'desc' }
+  });
 };
 
 export const toggleBanUserService = async (userId: string) => {
   const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error("User not found");
 
-  return prisma.user.update({
+  return await prisma.user.update({
     where: { id: userId },
-    data: { isBanned: !user?.isBanned },
+    data: { isBanned: !user.isBanned },
   });
 };
-
 
 export const getAllOrdersService = async () => {
-  return prisma.order.findMany({
+  return await prisma.order.findMany({
     include: {
-      customer: true,
+      customer: { select: { name: true, email: true } },
       items: { include: { medicine: true } },
     },
+    orderBy: { createdAt: 'desc' },
   });
 };
 
-// Category Add
 export const addCategoryService = async (name: string) => {
-  return prisma.category.create({ data: { name } });
+  return await prisma.category.create({ data: { name } });
 };
 
-// Category Delete
 export const deleteCategoryService = async (id: string) => {
-  return prisma.category.delete({ where: { id } });
+  return await prisma.category.delete({ where: { id } });
 };
